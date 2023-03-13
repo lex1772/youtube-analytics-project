@@ -14,9 +14,46 @@ class Channel:
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.channel_id = channel_id
+        self.__channel_id = channel_id
 
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
-        channel = self.youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
+        channel = self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
         print(channel)
+
+    @classmethod
+    def get_service(cls):
+        return cls.youtube
+
+    def to_json(self, name):
+        channel = self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
+        with open(name, "w", encoding='utf-8') as file:
+            json.dump(channel, file)
+
+    @property
+    def channel_id(self):
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['id']
+
+    @property
+    def title(self):
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['snippet']['title']
+
+    @property
+    def description(self):
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['snippet']['description']
+
+    @property
+    def url(self):
+        return "https://www.youtube.com/channel/" + self.channel_id
+
+    @property
+    def video_count(self):
+        return  self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['statistics']['videoCount']
+
+    @property
+    def subscriber_count(self):
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['statistics']['subscriberCount']
+
+    @property
+    def view_Count(self):
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['statistics']['viewCount']
