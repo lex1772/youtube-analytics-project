@@ -21,17 +21,10 @@ class PlayList:
 
     @property
     def title(self):
-        video_id = self.youtube.playlistItems().list(playlistId=self.playlist_id,
-                                                     part='contentDetails',
-                                                     maxResults=50,
-                                                     ).execute()['items'][0]['contentDetails']['videoId']
-        video_response = str({
-            self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails', id=video_id).execute()[
-                'items'][0]['snippet']['title']})
-        index = video_response.index("/")
-        title = video_response[index + 1:-2]
-        title = title.split()
-        return f'{title[0]}. {title[1]}'
+        self.playlist_info = self.youtube.playlists().list(id=self.playlist_id, part='contentDetails,snippet',
+                                                   maxResults=50, ).execute()
+
+        return self.playlist_info['items'][0]['snippet']['title']
 
     @property
     def url(self):

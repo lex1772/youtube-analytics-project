@@ -2,6 +2,9 @@ import os
 
 from googleapiclient.discovery import build
 
+from googleapiclient.errors import HttpError
+
+
 
 class Video:
     api_key: str = os.getenv('YouTube-API')
@@ -13,10 +16,18 @@ class Video:
 
     def print_info(self) -> None:
         """Выводит в консоль информацию о видео."""
-        video_response = self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
-                                                    id=self.__video_id
-                                                    ).execute()
-        print(video_response)
+        try:
+            video_response = self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+                                                        id=self.__video_id
+                                                        ).execute()
+        except HttpError:
+            return None
+        else:
+            video_response = self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+                                                        id=self.__video_id
+                                                        ).execute()
+            print(video_response)
+
 
     @property
     def video_id(self):
@@ -27,10 +38,9 @@ class Video:
 
     @property
     def video_title(self):
-        return \
-            self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
-                                       id=self.__video_id).execute()[
-                'items'][0]['snippet']['title']
+        return self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+                                      id=self.__video_id).execute()[
+            'items'][0]['snippet']['title']
 
     @property
     def url(self):
@@ -87,3 +97,8 @@ class PLVideo(Video):
     def playlist_id(self):
         return self.youtube.playlistItems().list(playlistId=self.__playlist_id, part='contentDetails',
                                                  maxResults=50, ).execute()['items']['0']['id']
+
+
+video1 = Video('111')
+video1.print_info()
+print(video1.url)
