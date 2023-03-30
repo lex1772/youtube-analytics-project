@@ -15,7 +15,6 @@ class Video:
         self.__video_id = video_id
 
     def print_info(self) -> None:
-        """Выводит в консоль информацию о видео."""
         try:
             self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
                                        id=self.__video_id).execute()[
