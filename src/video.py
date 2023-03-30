@@ -17,10 +17,10 @@ class Video:
     def print_info(self) -> None:
         """Выводит в консоль информацию о видео."""
         try:
-            video_response = self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
-                                                        id=self.__video_id
-                                                        ).execute()
-        except HttpError:
+            self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+                                       id=self.__video_id).execute()[
+                'items'][0]['id']
+        except IndexError:
             return None
         else:
             video_response = self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
@@ -31,34 +31,53 @@ class Video:
 
     @property
     def video_id(self):
-        return \
-            self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+        try:
+            return \
+                self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
                                        id=self.__video_id).execute()[
                 'items'][0]['id']
+        except IndexError:
+            return self.video_id
 
     @property
     def video_title(self):
-        return self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+        try:
+            return self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
                                       id=self.__video_id).execute()[
             'items'][0]['snippet']['title']
+        except IndexError:
+            return None
 
     @property
     def url(self):
-        return "https://www.youtube.com/watch?v=" + self.__video_id
+        try:
+            self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+                                       id=self.__video_id).execute()[
+                'items'][0]['id']
+        except IndexError:
+            return None
+        else:
+            return "https://www.youtube.com/watch?v=" + self.__video_id
 
     @property
     def views_count(self):
-        return \
+        try:
+            return \
             self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
                                        id=self.__video_id).execute()[
                 'items'][0]['statistics']['viewCount']
+        except IndexError:
+            return None
 
     @property
     def like_count(self):
-        return \
+        try:
+            return \
             self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
                                        id=self.__video_id).execute()[
                 'items'][0]['statistics']['likeCount']
+        except IndexError:
+            return None
 
     def __str__(self):
         return f"{self.video_title}"
@@ -99,6 +118,3 @@ class PLVideo(Video):
                                                  maxResults=50, ).execute()['items']['0']['id']
 
 
-video1 = Video('111')
-video1.print_info()
-print(video1.url)
